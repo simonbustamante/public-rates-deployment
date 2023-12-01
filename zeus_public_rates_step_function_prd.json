@@ -1,0 +1,93 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "glu_hq_refer_hq_zeus_cc_public_rates_prd_001",
+  "States": {
+    "glu_hq_refer_hq_zeus_cc_public_rates_prd_001": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "glu_hq_refer_hq_zeus_cc_public_rates_prd_001"
+      },
+      "Next": "StartCrawler-crwl-hq-std-prd-refer-zeus-public-rates"
+    },
+    "StartCrawler-crwl-hq-std-prd-refer-zeus-public-rates": {
+      "Type": "Task",
+      "Parameters": {
+        "Name": "crwl-hq-std-prd-refer-zeus-public-rates"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+      "Next": "GetCrawler-crwl-hq-std-prd-refer-zeus-public-rates"
+    },
+    "GetCrawler-crwl-hq-std-prd-refer-zeus-public-rates": {
+      "Type": "Task",
+      "Parameters": {
+        "Name": "crwl-hq-std-prd-refer-zeus-public-rates"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:glue:getCrawler",
+      "Next": "IsRunning?"
+    },
+    "IsRunning?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Crawler.State",
+          "StringEquals": "RUNNING",
+          "Next": "Wait"
+        }
+      ],
+      "Default": "lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa_001"
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Seconds": 5,
+      "Next": "GetCrawler-crwl-hq-std-prd-refer-zeus-public-rates"
+    },
+    "lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa_001": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:us-east-1:525196274797:function:lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa_001:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "statusCode?"
+    },
+    "statusCode?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.statusCode",
+          "NumericEquals": 200,
+          "Next": "SNS Publish - zeus-hq-public-rates-out-of-date-prd"
+        }
+      ],
+      "Default": "Pass"
+    },
+    "SNS Publish - zeus-hq-public-rates-out-of-date-prd": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message.$": "$",
+        "TopicArn": "arn:aws:sns:us-east-1:525196274797:zeus-hq-public-rates-out-of-date-prd"
+      },
+      "End": true
+    },
+    "Pass": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
