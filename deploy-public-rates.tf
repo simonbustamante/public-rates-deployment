@@ -2,13 +2,13 @@
 #### #### #### #### #### #### #### #### #### #### #### #### 
 #### #### #### #### #### #### #### #### #### #### #### #### 
 #### #### #### #### #### #### #### #### #### #### #### #### 
-#### aws.bi.LakeH.hq.prd #525196274797 #### #### #### #####
+#### aws.bi.LakeH.hq.prd #<account-id> #### #### #### #####
 #### #### #### #### #### #### #### #### #### #### #### #### 
 #### #### #### #### #### #### #### #### #### #### #### #### 
 #### #### #### #### #### #### #### #### #### #### #### #### 
 
 locals {
-  profile = "525196274797_AWSAdministratorAccess"
+  profile = "<account-id>_AWSAdministratorAccess"
   region = "us-east-1"
   file_cp_to_bucket = "glu_hq_refer_hq_zeus_cc_public_rates_prd_001"
   file_cp_to_bucket2 = "lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa_001"
