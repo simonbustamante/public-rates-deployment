@@ -1,7 +1,30 @@
 {
   "Comment": "A description of my state machine",
-  "StartAt": "glu_hq_refer_hq_zeus_cc_public_rates_prd_001",
+  "StartAt": "lmd_excel_to_csv_prd",
   "States": {
+    "lmd_excel_to_csv_prd": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:us-east-1:525196274797:function:lmd_excel_to_csv_prd"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "glu_hq_refer_hq_zeus_cc_public_rates_prd_001"
+    },
     "glu_hq_refer_hq_zeus_cc_public_rates_prd_001": {
       "Type": "Task",
       "Resource": "arn:aws:states:::glue:startJobRun.sync",

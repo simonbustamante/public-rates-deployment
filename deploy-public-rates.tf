@@ -12,9 +12,11 @@ locals {
   region = "us-east-1"
   file_cp_to_bucket = "glu_hq_refer_hq_zeus_cc_public_rates_prd_001"
   file_cp_to_bucket2 = "lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa_001"
+  file_cp_to_bucket3 = "lmd_excel_to_csv_prd"
   bucket_install_script = "s3-hq-raw-prd-intec"
   prefix_install_script = "app_glu_hq_refer_hq_zeus_cc_public_rates_prd_001"
   prefix_install_script2 = "app_lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa_001"
+  prefix_install_script3 = "app_lmd_excel_to_csv_prd"
   bucket_to_crawl = "s3-hq-std-prd-refer"
   prefix_to_crawl = "pblc_rts_std"
   svc_role_arn = "arn:aws:iam::525196274797:role/svc-role-data-mic-development-integrations"
@@ -60,6 +62,16 @@ resource "null_resource" "copy_source_code2" {
   }
   provisioner "local-exec" {
     command = "aws s3 cp ${local.file_cp_to_bucket2}.zip s3://${local.bucket_install_script}/${local.prefix_install_script2}/ --profile ${local.profile}"
+  }
+}
+
+# borrar el viejo y copiar el archivo al bucket
+resource "null_resource" "copy_source_code3" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    command = "aws s3 cp ${local.file_cp_to_bucket3}.zip s3://${local.bucket_install_script}/${local.prefix_install_script3}/ --profile ${local.profile}"
   }
 }
 
@@ -151,6 +163,23 @@ resource "aws_lambda_function" "lambda_function" {
 
   # Configuraciones adicionales como variables de entorno, memoria, tiempo de ejecución máximo, etc.
   timeout       = 15 #segundos
+}
+
+
+
+resource "aws_lambda_function" "lambda_function2" {
+  provider = aws.aws-bi-LakeH-hq-prd
+  function_name = local.file_cp_to_bucket3
+  role          = local.svc_role_arn
+
+  handler       = "${local.file_cp_to_bucket3}.lambda_handler" # Asegúrate de cambiar esto al nombre de tu archivo y método handler
+  runtime       = "python3.11" # Asegúrate de usar la versión correcta de Python
+
+  s3_bucket     = local.bucket_install_script
+  s3_key        = "${local.prefix_install_script3}/${local.file_cp_to_bucket3}.zip"
+
+  # Configuraciones adicionales como variables de entorno, memoria, tiempo de ejecución máximo, etc.
+  timeout       = 60 #segundos
 }
 
 

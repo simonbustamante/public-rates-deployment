@@ -25,7 +25,7 @@ prefix_raw = "pblc_rts"
 bucket_std = "s3-hq-std-prd-refer"
 prefix_std = "pblc_rts_std"
 #COUNTRY
-countries = ["bo", "hn", "gt"]
+countries = ["bo", "hn", "gt", "sv"]
 
 def getDate():
     current = datetime.now()
@@ -56,6 +56,46 @@ def cleanSupplyName(df):
             F.col("SPLY_NM_FULL")==F.lit("COOPERATIVA RURAL DE ELECTRIFICACION L T D A"),F.lit("CRE")
         ).when(
             F.col("SPLY_NM_FULL")==F.lit("ELECTRICIDAD DE LA PAZ S A"),F.lit("DELAPAZ")
+        ).when(
+            #EL SALVADOR
+            F.col("SPLY_NM_FULL")==F.lit("EMPRESA ELECTRICA DE ORIENTE S A DE C V"),F.lit("EEO")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("DISTRIBUIDORA ELECTRICA DE USULUTAN S A DE C V"),F.lit("DEUSEM")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("DISTRIBUIDORA DE ELECTRICIDAD DEL SUR S A DE C V"),F.lit("DELSUR")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("CAESS S A DE C V"),F.lit("CAESS")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("AES CLESA Y COMPANIA S EN C DE C V"),F.lit("AES")
+        ).when(
+            #COLOMBIA
+            F.col("SPLY_NM_FULL")==F.lit("ESSA ELEC.SANTANDER"),F.lit("ESSA")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("EMPRESAS PÚBLICAS DE MEDELLIN E.S.P."),F.lit("EPM")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("CENTRAL HIDROELÉCTRICA DE CALDAS S.A E.S.P"),F.lit("CHEC")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("CARIBEMAR"),F.lit("CARIBEMAR")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("ENERTOTAL"),F.lit("ENERTOTAL")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("ENERGIA DE PEREIRA S.A E.S.P"),F.lit("EEP")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("EMCALI E.I.C.E. ESP"),F.lit("EMCALI")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("CODENSA S.A"),F.lit("ESP")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("ENEL COLOMBIA S.A. E.S.P"),F.lit("ENEL")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("CENTRALES ELECTRICAS DEL NORTE DE SANTANDER SA ESP CENS"),F.lit("CENS")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("FIDUCIARIA BOGOTA S.A."),F.lit("FIDUBOGOTA")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("CELSIA TOLIMA"),F.lit("CELSIA")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("CARIBESOL"),F.lit("CARIBESOL")
+        ).when(
+            F.col("SPLY_NM_FULL")==F.lit("FIDEICOMISOS SOCIEDAD FIDUCIARIA DE OCCIDENTE SA"),F.lit("FIDUOCCIDENTE")
         ).otherwise(
             F.lit("Unknown")
         )
@@ -69,6 +109,10 @@ def getAcronymCountry(df):
         F.col("CTRY_CD") == F.lit("Guatemala"), F.lit("GT")
     ).when(
         F.col("CTRY_CD") == F.lit("Honduras"), F.lit("HN")
+    ).when(
+        F.col("CTRY_CD") == F.lit("Colombia"), F.lit("CO")
+    ).when(
+        (F.col("CTRY_CD") == F.lit("El Salvador")) | (F.col("CTRY_CD") == F.lit("Salvador")), F.lit("SV")
     ).otherwise(F.lit(None)))
     return df
 
