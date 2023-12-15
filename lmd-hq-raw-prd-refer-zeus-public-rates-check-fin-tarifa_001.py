@@ -6,7 +6,7 @@ import datetime
 def lambda_handler(event, context):
     
     athena = boto3.client('athena')
-    s3_output = 's3://aws-athena-query-results-525196274797-us-east-1/lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa/'
+    s3_output = 's3://<your-bucker>/lmd-hq-raw-prd-refer-zeus-public-rates-check-fin-tarifa/'
     
     # La fecha de hoy en el formato MM/DD/YYYY
     fecha_hoy = datetime.datetime.now().strftime("%Y-%m-%d")
